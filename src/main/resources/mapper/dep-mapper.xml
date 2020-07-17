@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.DepDao">
+    <resultMap id="depMap" type="dep">
+        <id property="depId" column="department_Id"></id>
+        <result property="depName" column="department_Name"></result>
+        <!--一对多映射-->
+        <!--&lt;!&ndash;ofType用于集和中元素的类型&ndash;&gt;-->
+        <!--<collection property="empList" ofType="emp">-->
+            <!--<id property="empId" column="employee_id"></id>-->
+            <!--<result property="firstName" column="first_Name"></result>-->
+            <!--<result property="salary" column="salary"></result>-->
+            <!--<result property="hireDate" column="hire_date"></result>-->
+            <!--<result property="depId" column="department_id"></result>-->
+
+        <!--</collection>-->
+        <!--一对多映射-->
+        <collection property="empList"
+                    ofType="emp"
+                    select="dao.EmpDao.findEmpByDepId"
+                    column="department_id">
+        </collection>
+    </resultMap>
+<select id="findDepName" resultMap="depMap">
+    select *from departments
+</select>
+</mapper>

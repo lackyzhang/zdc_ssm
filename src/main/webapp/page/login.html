@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <base href="http://localhost:9090/">
+    <script src="js/jquery-2.2.2.js"></script>
+    <title>Title</title>
+</head>
+<body>
+<form id="loginForm">
+    <input type="text" name="userName" placeholder="userName"><br>
+    <input type="password" name="password" placeholder="password"><br>
+    <input type="button" value="登录" id="loginButton">
+</form>
+<div id="error" style="color: red">
+
+</div>
+
+</body>
+</html>
+<script>
+    $(function () {
+        $("#loginButton").click(function () {
+            $.ajax({
+                url:"login",
+                type:"get",
+                dataType:"json",
+                data:$("#loginForm").serialize(),
+                success:function (data) {
+                    console.log(data);
+                    if (data.code==0) {
+                        location.href="page/success.html";
+                    }else {
+                        console.log("error");
+                        $("#error").text(data.message);
+                    }
+                }
+            })
+        });
+    });
+</script>

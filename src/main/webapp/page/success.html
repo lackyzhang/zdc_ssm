@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <base href="http://localhost:9090/">
+    <script src="js/jquery-2.2.2.js"></script>
+    <title>Title</title>
+</head>
+<body>
+<div id="depname"></div>
+</body>
+</html>
+<script>
+    $(function () {
+            $.ajax({
+                url:"depinfo",
+                type:"get",
+                dataType:"json",
+                success:function (data) {
+                    data.get
+                    $("#depname").append()
+                    for (var i=1;i<data.length;i++) {
+                        $("#depname").append('<table><tr><td>'+data[i].depName+'</td></tr>')
+                    }
+                    }
+
+
+            })
+        })
+
+</script>

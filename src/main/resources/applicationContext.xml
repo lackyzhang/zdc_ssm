@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:cache="http://www.springframework.org/schema/cache"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+    <!--扫描包开启注解-->
+    <context:component-scan base-package="service"></context:component-scan>
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="username" value="root"></property>
+        <property name="password" value="root"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/luntan"></property>
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="initialSize" value="10"></property>
+        <property name="minIdle" value="5"></property>
+        <property name="maxActive" value="50"></property>
+    </bean>
+    <!--配置SqlSessionFactory用于替换MyBatis中原生的SqlSessionFactory-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--注入数据源-->
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="configLocation" value="classpath:mybatis.xml"></property>
+    </bean>
+    <!--配置MyBatis生成DAO实例的扫描器-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="dao"></property>
+    </bean>
+    <!--Jedis连接池配置对象-->
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="minIdle" value="5"></property>
+        <property name="maxTotal" value="50"></property>
+        <property name="maxIdle" value="10"></property>
+    </bean>
+    <!--&lt;!&ndash; Session共享 &ndash;&gt;-->
+    <!--<bean id="redisHttpSessionConfiguration"-->
+          <!--class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration" >-->
+        <!--<property name="maxInactiveIntervalInSeconds" value="7200" />-->
+    <!--</bean>-->
+    <!--配置事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--注入数据源-->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!--配置事务拦截器（事务通知）-->
+    <!--需要注入事务管理器-->
+    <tx:advice id="transactionInterceptor" transaction-manager="transactionManager">
+        <!--配置事务的隔离性和传播行为-->
+        <tx:attributes>
+            <!--name表示要作用事务的方法名-->
+            <!--isolation设置事务的隔离级别-->
+            <!--propagation设置事务的传播性-->
+            <tx:method name="find*" isolation="READ_COMMITTED" propagation="REQUIRED"></tx:method>
+            <tx:method name="modify*" isolation="DEFAULT" propagation="REQUIRED"></tx:method>
+            <tx:method name="update*"></tx:method>
+            <tx:method name="insert*"></tx:method>
+            <tx:method name="add*"></tx:method>
+            <tx:method name="save*"></tx:method>
+            <tx:method name="delete*"></tx:method>
+        </tx:attributes>
+    </tx:advice>
+    <!--配置事务的AOP切入-->
+    <aop:config>
+        <aop:pointcut id="transactionPoint" expression="execution(* service.*.*(..))"></aop:pointcut>
+        <aop:advisor advice-ref="transactionInterceptor" pointcut-ref="transactionPoint"></aop:advisor>
+    </aop:config>
+</beans>
+

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.EmpDao">
+        <!--用于延迟加载的ResultMap-->
+        <resultMap id="empMap" type="emp">
+            <id property="empId" column="employee_Id"></id>
+            <result property="firstName" column="first_Name"></result>
+            <result property="lastName" column="last_Name"></result>
+            <result property="depId" column="department_id"></result>
+
+
+
+        </resultMap>
+        <select id="findEmp" resultMap="empMap">
+            select * from employees
+        </select>
+        <select id="findEmpByDepId" resultMap="empMap">
+            select * from employees where department_id = #{depId}
+        </select>
+
+</mapper>
